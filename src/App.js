@@ -9,33 +9,7 @@ function getTitle(title) {
   return title;
 };
 
-const initialStories = [
-  {
-    title: 'React',
-    url: 'https://reactjs.org/',
-    author: 'Jordan Walke',
-    num_comments: 3,
-    points: 4,
-    objectID: 0,
-  },
-  {
-    title: 'redux',
-    url: 'https://redux.js.org/',
-    author: 'Dan Abramov, Andrew Clark',
-    num_comments: 2,
-    points: 5,
-    objectID: 1,
-  },
-  {
-    title: 'kafka',
-    url: 'https://kafka.apache.org/',
-    author: 'Jim Swift',
-    num_comments: 232,
-    points: 225,
-    objectID: 3,
-  },
 
-];
 
 // short version
 // const getAsyncStories = () =>
@@ -48,13 +22,7 @@ const initialStories = [
 //   );
 
 // artificial delay for demo of async
-const getAsyncStories = () =>
-  new Promise(resolve =>
-    setTimeout(
-      () => resolve({ data: { stories: initialStories } }),
-      2000
-    )
-  );
+
 
 // causes an error  
 // const getAsyncStories = () =>
@@ -107,6 +75,8 @@ const storiesReducer = (state, action) => {
       throw new Error();
   }
 };
+const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
+
 
 
 const App = () => {
@@ -124,19 +94,42 @@ const App = () => {
 
 
   React.useEffect(() => {
+
+    if (!searchTerm) return;
+
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
 
-    getAsyncStories()
+    fetch(`${API_ENDPOINT}${searchTerm}`) // B
+      .then(response => response.json()) // C
       .then(result => {
         dispatchStories({
           type: 'STORIES_FETCH_SUCCESS',
-          payload: result.data.stories,
+          payload: result.hits, //D 
         });
       })
       .catch(() =>
-        dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
+        dispatchStories({
+          type: 'STORIES_FETCH_FAILURE'
+        })
       );
-  }, []);
+  }, [searchTerm]);
+
+  // React.useEffect(() => {
+  //   dispatchStories({ type: 'STORIES_FETCH_INIT' });
+
+  //   fetch(`${API_ENDPOINT}react`) // B
+  //     .then(response => response.json()) // C
+  //     .then(result => {
+  //       dispatchStories({
+  //         type: 'STORIES_FETCH_SUCCESS',
+  //         payload: result.hits, // D
+  //       });
+  //     })
+  //     .catch(() =>
+  //       dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
+  //     );
+  // }, []);
+
 
   const handleRemoveStory = item => {
     dispatchStories({
@@ -188,7 +181,7 @@ const App = () => {
       {stories.isLoading ? (
         <p>Loading...</p>
       ) : (
-          <List list={searchedStories} onRemoveItem={handleRemoveStory} />
+          <List list={stories.data} onRemoveItem={handleRemoveStory} />
         )}
     </div>
   );
