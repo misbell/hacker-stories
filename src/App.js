@@ -1,15 +1,13 @@
-import React from 'react';
+import React from "react"
 
 const welcome = {
-  greeting: 'Working',
-  title: 'Example',
-};
+  greeting: "Working",
+  title: "Example",
+}
 
 function getTitle(title) {
-  return title;
-};
-
-
+  return title
+}
 
 // short version
 // const getAsyncStories = () =>
@@ -23,102 +21,92 @@ function getTitle(title) {
 
 // artificial delay for demo of async
 
-
-// causes an error  
+// causes an error
 // const getAsyncStories = () =>
 //   new Promise((resolve, reject) => setTimeout(reject, 2000));
 
 const useSemiPersistentState = (key, initialState) => {
-  const [value, setValue] =
-    React.useState(
-      localStorage.getItem(key) || initialState
-    );
+  const [value, setValue] = React.useState(
+    localStorage.getItem(key) || initialState,
+  )
 
   React.useEffect(() => {
-    localStorage.setItem(key, value);
-  }, [value]);
+    localStorage.setItem(key, value)
+  }, [value])
 
-  return [value, setValue];
-
-};
-
+  return [value, setValue]
+}
 
 const storiesReducer = (state, action) => {
   switch (action.type) {
-    case 'STORIES_FETCH_INIT':
+    case "STORIES_FETCH_INIT":
       return {
         ...state,
         isLoading: true,
         isError: false,
-      };
-    case 'STORIES_FETCH_SUCCESS':
+      }
+    case "STORIES_FETCH_SUCCESS":
       return {
         ...state,
         isLoading: false,
         isError: false,
         data: action.payload,
-      };
-    case 'STORIES_FETCH_FAILURE':
+      }
+    case "STORIES_FETCH_FAILURE":
       return {
         ...state,
         isLoading: false,
         isError: true,
-      };
-    case 'REMOVE_STORY':
+      }
+    case "REMOVE_STORY":
       return {
         ...state,
         data: state.data.filter(
-          story => action.payload.objectID !== story.objectID
+          (story) => action.payload.objectID !== story.objectID,
         ),
-      };
+      }
     default:
-      throw new Error();
+      throw new Error()
   }
-};
-const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
-
-
+}
+const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query="
 
 const App = () => {
-
-  const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
+  const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React")
 
   // const [stories, setStories] = React.useState([]);
 
-  const [stories, dispatchStories] = React.useReducer(
-    storiesReducer,
-    {
-      data: [], isLoading: false, isError: false
-    }
-  );
-
+  const [stories, dispatchStories] = React.useReducer(storiesReducer, {
+    data: [],
+    isLoading: false,
+    isError: false,
+  })
 
   //React.useEffect(() => {
 
   const handleFetchStories = React.useCallback(() => {
+    if (!searchTerm) return
 
-    if (!searchTerm) return;
-
-    dispatchStories({ type: 'STORIES_FETCH_INIT' });
+    dispatchStories({ type: "STORIES_FETCH_INIT" })
 
     fetch(`${API_ENDPOINT}${searchTerm}`) // B
-      .then(response => response.json()) // C
-      .then(result => {
+      .then((response) => response.json()) // C
+      .then((result) => {
         dispatchStories({
-          type: 'STORIES_FETCH_SUCCESS',
-          payload: result.hits, //D 
-        });
+          type: "STORIES_FETCH_SUCCESS",
+          payload: result.hits, //D
+        })
       })
       .catch(() =>
         dispatchStories({
-          type: 'STORIES_FETCH_FAILURE'
-        })
-      );
-  }, [searchTerm]);
+          type: "STORIES_FETCH_FAILURE",
+        }),
+      )
+  }, [searchTerm])
 
   React.useEffect(() => {
-    handleFetchStories();
-  }, [handleFetchStories]);
+    handleFetchStories()
+  }, [handleFetchStories])
 
   // React.useEffect(() => {
   //   dispatchStories({ type: 'STORIES_FETCH_INIT' });
@@ -136,23 +124,22 @@ const App = () => {
   //     );
   // }, []);
 
-
-  const handleRemoveStory = item => {
+  const handleRemoveStory = (item) => {
     dispatchStories({
-      type: 'REMOVE_STORY',
+      type: "REMOVE_STORY",
       payload: item,
     })
   }
 
   React.useEffect(() => {
-    localStorage.setItem('search', searchTerm);
-  }, [searchTerm]);
+    localStorage.setItem("search", searchTerm)
+  }, [searchTerm])
 
-  const handleSearch = event => {
-    setSearchTerm(event.target.value);
-  };
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value)
+  }
 
-  // note this still runs on render 
+  // note this still runs on render
   // even if not called anywhere
   // const searchedStories = stories.data.filter(function (story) {
 
@@ -167,9 +154,11 @@ const App = () => {
 
   return (
     <div>
-      <h1>{welcome.greeting} {welcome.title}</h1>
+      <h1>
+        {welcome.greeting} {welcome.title}
+      </h1>
 
-      <h1>{getTitle('Interactive Search')}</h1>
+      <h1>{getTitle("Interactive Search")}</h1>
 
       <InputWithLabel
         id="search"
@@ -180,7 +169,6 @@ const App = () => {
       >
         <strong>Search:</strong>
       </InputWithLabel>
-      />
 
       <hr />
 
@@ -189,41 +177,37 @@ const App = () => {
       {stories.isLoading ? (
         <p>Loading...</p>
       ) : (
-          <List list={stories.data} onRemoveItem={handleRemoveStory} />
-        )}
+        <List list={stories.data} onRemoveItem={handleRemoveStory} />
+      )}
     </div>
-  );
-};
+  )
+}
 
-const InputWithLabel = (
-  {
-    id,
-    label,
-    value,
-    type = 'text',
-    onInputChange,
-    isFocused,
-    children,
-  }) => {
-
+const InputWithLabel = ({
+  id,
+  label,
+  value,
+  type = "text",
+  onInputChange,
+  isFocused,
+  children,
+}) => {
   // imperative code
 
-  const inputRef = React.useRef();
+  const inputRef = React.useRef()
 
   React.useEffect(() => {
-
     if (isFocused && inputRef.current) {
-      inputRef.current.focus();
+      inputRef.current.focus()
     }
-
-  }, [isFocused]);
+  }, [isFocused])
 
   // imperative code ends
 
   return (
     <>
       <label htmlFor={id}>{children}</label>
-        &nbsp;
+      &nbsp;
       <input
         ref={inputRef}
         id={id}
@@ -233,18 +217,14 @@ const InputWithLabel = (
         onChange={onInputChange}
       />
     </>
-  );
-
-};
+  )
+}
 
 const Search = ({ search, onSearch }) => {
-
   return (
     <>
       <label htmlFor="search">Search: </label>
-      <input id="search" type="text"
-        value={search}
-        onChange={onSearch} />
+      <input id="search" type="text" value={search} onChange={onSearch} />
     </>
   )
 }
@@ -283,22 +263,17 @@ const Search = ({ search, onSearch }) => {
 // )
 
 const List = ({ list, onRemoveItem }) =>
-  list.map(item => (
-    <Item
-      key={item.objectID}
-      item={item}
-      onRemoveItem={onRemoveItem}
-    />
-  ));
+  list.map((item) => (
+    <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
+  ))
 
 const Item = ({ item, onRemoveItem }) => {
   // const handleRemoveItem = () => {
   //   onRemoveItem(item);
   // };
   function handleRemoveItem() {
-    onRemoveItem(item); // MPI same thing
+    onRemoveItem(item) // MPI same thing
   }
-
 
   return (
     <div>
@@ -311,13 +286,18 @@ const Item = ({ item, onRemoveItem }) => {
       <span>
         {/* <button type="button" onClick={handleRemoveItem}> */}
         {/* <button type="button" onClick={onRemoveItem.bind(null, item)}> */}
-        <button type="button" onClick={() => { onRemoveItem(item) }}>
+        <button
+          type="button"
+          onClick={() => {
+            onRemoveItem(item)
+          }}
+        >
           {/* all three lines end up doing same thing MPI */}
           Dismiss
-          </button>
+        </button>
       </span>
-    </div >
+    </div>
   )
 }
 
-export default App;
+export default App
