@@ -38,10 +38,8 @@ const useSemiPersistentState = (key, initialState) => {
   return [value, setValue];
 
 };
-fe4c8cb7c5e8a9c831f62cf8378263e5ec89a4
 
-return [value, setValue]
-}
+
 
 const storiesReducer = (state, action) => {
   switch (action.type) {
