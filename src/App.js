@@ -31,11 +31,16 @@ const useSemiPersistentState = (key, initialState) => {
   )
 
   React.useEffect(() => {
-    localStorage.setItem(key, value)
-  }, [value])
 
+    localStorage.setItem(key, value);
+  }, [value, key]);
 
-  return [value, setValue]
+  return [value, setValue];
+
+};
+fe4c8cb7c5e8a9c831f62cf8378263e5ec89a4
+
+return [value, setValue]
 }
 
 const storiesReducer = (state, action) => {
@@ -104,9 +109,9 @@ const App = () => {
     dispatchStories({ type: "STORIES_FETCH_INIT" })
 
 
-    fetch(`${API_ENDPOINT}${searchTerm}`) // B
-      .then((response) => response.json()) // C
-      .then((result) => {
+    fetch(url) // B
+      .then(response => response.json()) // C
+      .then(result => {
 
         dispatchStories({
           type: "STORIES_FETCH_SUCCESS",
@@ -116,10 +121,10 @@ const App = () => {
       .catch(() =>
         dispatchStories({
 
-          type: "STORIES_FETCH_FAILURE",
-        }),
-      )
-  }, [searchTerm])
+          type: 'STORIES_FETCH_FAILURE'
+        })
+      );
+  }, [url]);
 
 
   React.useEffect(() => {
@@ -188,8 +193,26 @@ const App = () => {
         <strong>Search:</strong>
       </InputWithLabel>
 
+      <button
+        type="button"
+        disabled={!searchTerm}
+        onClick={handleSearchSubmit}
+      > Submit
+        </button>
 
-    </div>
+
+      <hr />
+
+      {stories.isError && <p>Something went wrong...</p>}
+
+      {
+        stories.isLoading ? (
+          <p>Loading...</p>
+        ) : (
+            <List list={stories.data} onRemoveItem={handleRemoveStory} />
+          )
+      }
+    </div >
   )
 }
 
